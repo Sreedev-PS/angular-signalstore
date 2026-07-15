@@ -18,5 +18,5 @@ const CountStore = signalStore(
 })
 export class App { 
 
-private count = signal(0);
+private count = signal(0); 
 }

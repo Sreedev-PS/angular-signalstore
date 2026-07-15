@@ -1,0 +1,50 @@
+<header class="topbar">
+  <a class="brand" href="#main"><span class="brand-mark">S</span><span>Signal Store Lab</span></a>
+  <div class="version"><span class="status-dot"></span>Angular 20.3.17</div>
+  <a class="docs-link" href="https://ngrx.io/guide/signals/signal-store" target="_blank" rel="noreferrer">NgRx docs ↗</a>
+</header>
+<main id="main" class="workspace">
+  <aside class="lesson-rail" aria-label="Course lessons">
+    <div class="rail-heading"><span>LEARNING PATH</span><strong>{{ activeLesson() + 1 }}/{{ lessons.length }}</strong></div>
+    <nav>
+      @for (item of lessons; track item.title; let index = $index) {
+        <button class="lesson-link" [class.active]="activeLesson() === index" (click)="selectLesson(index)">
+          <span class="lesson-number">0{{ index + 1 }}</span><span>{{ item.title }}</span>
+          @if (index < activeLesson()) { <span class="check" aria-label="Complete">✓</span> }
+        </button>
+      }
+    </nav>
+    <div class="rail-note"><span class="spark">✦</span><p><strong>Learn by changing things.</strong><br>Every control updates the real store.</p></div>
+  </aside>
+  <section class="lesson-panel">
+    <div class="lesson-copy"><p class="eyebrow">{{ lesson().eyebrow }}</p><h1>{{ lesson().title }}</h1><p class="concept">{{ lesson().concept }}</p></div>
+    <div class="code-block"><div class="code-bar"><span>task.store.ts</span><span class="language">TYPESCRIPT</span></div><pre><code>{{ lesson().code }}</code></pre></div>
+    <div class="lesson-actions">
+      <button class="previous" [disabled]="activeLesson() === 0" (click)="selectLesson(activeLesson() - 1)">← Previous</button>
+      <button class="next" [disabled]="activeLesson() === lessons.length - 1" (click)="selectLesson(activeLesson() + 1)">Next lesson →</button>
+    </div>
+  </section>
+  <section class="lab-panel" aria-label="Interactive task store">
+    <div class="lab-header"><div><p class="eyebrow">LIVE PLAYGROUND</p><h2>Task board</h2></div><button class="reset" title="Restore example tasks" (click)="store.reset()">↻ <span>Reset</span></button></div>
+    <form class="task-form" (ngSubmit)="addTask()">
+      <label class="sr-only" for="new-task">New task</label>
+      <input id="new-task" name="newTask" [ngModel]="newTask()" (ngModelChange)="newTask.set($event)" placeholder="Add something to learn..." autocomplete="off">
+      <button type="submit" [disabled]="!newTask().trim()">Add task</button>
+    </form>
+    <div class="filters" aria-label="Filter tasks">@for (filter of filters; track filter) { <button [class.active]="store.filter() === filter" (click)="store.setFilter(filter)">{{ filter }}</button> }</div>
+    <ul class="task-list">
+      @for (task of store.visibleTasks(); track task.id) {
+        <li><button class="toggle" [class.checked]="task.done" (click)="store.toggleTask(task.id)" [attr.aria-label]="task.done ? 'Mark active' : 'Mark complete'">{{ task.done ? '✓' : '' }}</button><span [class.done]="task.done">{{ task.title }}</span><button class="delete" title="Delete task" (click)="store.removeTask(task.id)" aria-label="Delete task">×</button></li>
+      } @empty { <li class="empty">No tasks in this view.</li> }
+    </ul>
+    <div class="summary"><span><strong>{{ store.completedCount() }}</strong> of {{ store.tasks().length }} complete</span><button (click)="store.clearCompleted()" [disabled]="store.completedCount() === 0">Clear completed</button></div>
+    <div class="state-viewer">
+      <button class="state-toggle" (click)="stateOpen.set(!stateOpen())" [attr.aria-expanded]="stateOpen()"><span><i></i> LIVE STORE STATE</span><span>{{ stateOpen() ? '−' : '+' }}</span></button>
+      @if (stateOpen()) { <pre>{
+  "tasks": {{ store.tasks().length }},
+  "filter": "{{ store.filter() }}",
+  "completedCount": {{ store.completedCount() }}
+}</pre> }
+    </div>
+  </section>
+</main>
